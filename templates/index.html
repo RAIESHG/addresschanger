@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF File Modifier</title>
+</head>
+<body>
+    <h1>Upload DXF File</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" required><br><br>
+        <input type="text" name="JOB_LOC1" placeholder="Enter value for JOB_LOC1"><br><br>
+        <input type="text" name="JOB_LOC2" placeholder="Enter value for JOB_LOC2"><br><br>
+        <input type="text" name="JOB_LOC3" placeholder="Enter value for JOB_LOC3"><br><br>
+        <input type="text" name="JOB_LOC4" placeholder="Enter value for JOB_LOC4"><br><br>
+        <button type="button" onclick="uploadFile()">Upload and Modify</button>
+    </form>
+
+    <script>
+        function uploadFile() {
+            event.preventDefault();
+            var form = document.getElementById('uploadForm');
+            var formData = new FormData(form);
+
+            fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a Blob from the response and trigger download
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'modified_file.dxf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
